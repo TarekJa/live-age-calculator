@@ -78,6 +78,7 @@
       font-size:14px;
     }
 
+    /* ====== HINTS ====== */
     .hint{
       margin-top: 6px;
       font-size: 12px;
@@ -194,6 +195,7 @@
   <div class="page">
     <div class="container">
 
+      <!-- ====== APP ====== -->
       <div class="box">
         <h1 id="title">حاسبة العمر المباشر</h1>
         <div class="subnote">
@@ -220,6 +222,7 @@
             اختياري. إذا تركته فارغًا سنعتبر الوقت <b>00:00:00</b>.<br>
             عادةً الإدخال يكون بنظام <b>24 ساعة</b>: مثال <b>07:30</b> (AM صباحًا) أو <b>19:30</b> (PM مساءً).
           </div>
+          <div class="hint" id="timePreview"></div>
         </div>
 
         <div class="actions">
@@ -320,7 +323,34 @@
       $("birthTime").value = t;
     }
 
+    function updateTimePreview(){
+      const preview = $("timePreview");
+      if (!preview) return;
+
+      const t = ($("birthTime").value || "").trim();
+
+      if (!t){
+        preview.innerHTML = 'سيتم اعتبار الوقت <b>00:00:00</b> إذا تركته فارغًا.';
+        return;
+      }
+
+      const parts = t.split(":").map(Number);
+      const hh24 = parts[0] ?? 0;
+      const mm = parts[1] ?? 0;
+
+      const isPM = hh24 >= 12;
+      let hh12 = hh24 % 12;
+      if (hh12 === 0) hh12 = 12;
+
+      const ampm = isPM ? "PM" : "AM";
+      const mm2 = String(mm).padStart(2, "0");
+
+      preview.textContent = `${t} = ${hh12}:${mm2} ${ampm}`;
+    }
+
     function buildLocalDate(dateStr, timeStr){
+      // dateStr: YYYY-MM-DD
+      // timeStr: HH:MM(:SS)  (عادةً 24 ساعة)
       const parts = (dateStr || "").split("-").map(Number);
       if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
 
@@ -361,11 +391,15 @@
       localStorage.removeItem(STORAGE_KEYS.name);
       localStorage.removeItem(STORAGE_KEYS.date);
       localStorage.removeItem(STORAGE_KEYS.time);
+
+      updateTimePreview();
     }
 
     function start(){
       const name = ($("name").value || "").trim();
       const date = $("birthDate").value;
+
+      // إذا ترك الوقت فارغًا سيتم اعتباره 00:00:00
       const time = $("birthTime").value || "00:00:00";
 
       if (!date){
@@ -402,6 +436,7 @@
         const days    = Math.floor(hours / 24);
         const weeks   = Math.floor(days / 7);
 
+        // Approximate years/months using average year length
         const yearsApprox  = diffMs / (1000 * 60 * 60 * 24 * 365.2425);
         const monthsApprox = yearsApprox * 12;
 
@@ -419,12 +454,21 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      // منع اختيار تاريخ مستقبلي (تحسين تجربة المستخدم)
+      const today = new Date().toISOString().split("T")[0];
+      $("birthDate").setAttribute("max", today);
+
       restoreInputs();
+
+      // معاينة AM/PM للوقت + رسالة عند تركه فارغًا
+      updateTimePreview();
+      $("birthTime").addEventListener("input", updateTimePreview);
 
       ["name","birthDate","birthTime"].forEach(id => {
         $(id).addEventListener("input", saveInputs);
       });
 
+      // Optional: إذا كانت البيانات موجودة، شغّل الحساب تلقائيًا
       if ($("birthDate").value) {
         start();
       }
