@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>حاسبة العمر المباشر</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 540px;
+    }
+
+    /* ====== HEADER ====== */
+    .header {
+      background: linear-gradient(135deg, #020617, #020617);
+      border-radius: 16px;
+      padding: 18px 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #38bdf8;
+    }
+
+    .header .role {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .header .contact {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #cbd5f5;
+    }
+
+    .header a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+
+    .header a:hover {
+      text-decoration: underline;
+    }
+
+    /* ====== BOX ====== */
+    .box {
+      background: #020617;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.7);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #38bdf8;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 10px;
+      background: #38bdf8;
+      color: #020617;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    .result {
+      margin-top: 22px;
+      display: none;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid #1e293b;
+      font-size: 14px;
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: #94a3b8;
+    }
+
+    .value {
+      font-weight: bold;
+      color: #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <div class="container">
+
+    <!-- ====== TAREK JAWISH HEADER ====== -->
+    <div class="header">
+      <h2>Tarek Jawish</h2>
+      <div class="role">MEAL Expert</div>
+      <div class="contact">
+        tarekjawish89@gmail.com<br>
+        <a href="https://www.linkedin.com/in/tarek-jawish-890998106/" target="_blank">
+          LinkedIn Profile
+        </a>
+      </div>
+    </div>
+
+    <!-- ====== APP ====== -->
+    <div class="box">
+      <h1 id="title">حاسبة العمر المباشر</h1>
+
+      <div class="field">
+        <label>الاسم</label>
+        <input type="text" id="name" placeholder="أدخل الاسم">
+      </div>
+
+      <div class="field">
+        <label>تاريخ الميلاد</label>
+        <input type="date" id="birthDate">
+      </div>
+
+      <div class="field">
+        <label>ساعة الميلاد</label>
+        <input type="time" id="birthTime" step="1">
+      </div>
+
+      <button onclick="start()">احسب العمر</button>
+
+      <div class="result" id="result">
+        <div class="row"><div class="label">السنوات</div><div class="value" id="years"></div></div>
+        <div class="row"><div class="label">الأشهر (تقريب)</div><div class="value" id="months"></div></div>
+        <div class="row"><div class="label">الأسابيع</div><div class="value" id="weeks"></div></div>
+        <div class="row"><div class="label">الأيام</div><div class="value" id="days"></div></div>
+        <div class="row"><div class="label">الساعات</div><div class="value" id="hours"></div></div>
+        <div class="row"><div class="label">الدقائق</div><div class="value" id="minutes"></div></div>
+        <div class="row"><div class="label">الثواني</div><div class="value" id="seconds"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let interval;
+
+  function start() {
+    const name = document.getElementById("name").value || "—";
+    const date = document.getElementById("birthDate").value;
+    const time = document.getElementById("birthTime").value || "00:00:00";
+
+    if (!date) {
+      alert("يرجى إدخال تاريخ الميلاد");
+      return;
+    }
+
+    const birthDate = new Date(date + "T" + time);
+
+    document.getElementById("title").textContent =
+      "العمر المباشر لـ " + name;
+
+    document.getElementById("result").style.display = "block";
+
+    if (interval) clearInterval(interval);
+
+    function update() {
+      const now = new Date();
+      const diffMs = now - birthDate;
+
+      const seconds = Math.floor(diffMs / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours   = Math.floor(minutes / 60);
+      const days    = Math.floor(hours / 24);
+      const weeks   = Math.floor(days / 7);
+
+      const yearsExact  = days / 365.2422;
+      const monthsExact = yearsExact * 12;
+
+      document.getElementById("years").textContent   = yearsExact.toFixed(6);
+      document.getElementById("months").textContent  = monthsExact.toFixed(2);
+      document.getElementById("weeks").textContent   = weeks.toLocaleString();
+      document.getElementById("days").textContent    = days.toLocaleString();
+      document.getElementById("hours").textContent   = hours.toLocaleString();
+      document.getElementById("minutes").textContent = minutes.toLocaleString();
+      document.getElementById("seconds").textContent = seconds.toLocaleString();
+    }
+
+    update();
+    interval = setInterval(update, 1000);
+  }
+</script>
+
+</body>
+</html>
