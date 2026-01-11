@@ -47,41 +47,6 @@
       margin: 0 auto;
     }
 
-    .header{
-      background: linear-gradient(135deg, var(--panel), var(--panel));
-      border-radius:16px;
-      padding:18px 22px;
-      margin-bottom:16px;
-      box-shadow:0 0 30px rgba(0,0,0,0.6);
-      text-align:center;
-    }
-
-    .header h2{
-      margin:0;
-      color: var(--accent);
-      font-size:22px;
-      letter-spacing: 0.2px;
-    }
-
-    .header .role{
-      margin-top:6px;
-      font-size:14px;
-      color: var(--muted);
-    }
-
-    .header .contact{
-      margin-top:6px;
-      font-size:13px;
-      color:#cbd5f5;
-      line-height: 1.6;
-    }
-
-    .header a{
-      color: var(--accent);
-      text-decoration:none;
-    }
-    .header a:hover{ text-decoration:underline; }
-
     .box{
       background: var(--panel);
       padding: 24px;
@@ -113,7 +78,6 @@
       font-size:14px;
     }
 
-    /* ====== HINTS ====== */
     .hint{
       margin-top: 6px;
       font-size: 12px;
@@ -211,10 +175,17 @@
       font-weight: normal;
     }
 
+    /* تنسيق بسيط لبيانات التواصل */
+    .contact-meta{
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+      line-height: 1.9;
+    }
+
     @media (max-width: 420px){
       .box{ padding: 18px; }
       h1{ font-size: 20px; }
-      .header h2{ font-size: 20px; }
     }
   </style>
 </head>
@@ -223,19 +194,6 @@
   <div class="page">
     <div class="container">
 
-      <!-- ====== HEADER ====== -->
-      <div class="header">
-        <h2>Tarek Jawish</h2>
-        <div class="role">MEAL Expert</div>
-        <div class="contact">
-          tarekjawish89@gmail.com<br>
-          <a href="https://www.linkedin.com/in/tarek-jawish-890998106/" target="_blank" rel="noopener noreferrer">
-            LinkedIn Profile
-          </a>
-        </div>
-      </div>
-
-      <!-- ====== APP ====== -->
       <div class="box">
         <h1 id="title">حاسبة العمر المباشر</h1>
         <div class="subnote">
@@ -307,8 +265,19 @@
           <details id="contact">
             <summary>تواصل</summary>
             <p>
-              للتواصل: tarekjawish89@gmail.com
+              إذا عندك اقتراحات أو ملاحظات على الموقع، تواصل معي عبر الوسائل التالية:
             </p>
+
+            <div class="contact-meta">
+              <div><b>الاسم:</b> Tarek Jawish</div>
+              <div><b>الصفة:</b> MEAL Expert</div>
+              <div><b>البريد:</b> <a href="mailto:tarekjawish89@gmail.com">tarekjawish89@gmail.com</a></div>
+              <div><b>LinkedIn:</b>
+                <a href="https://www.linkedin.com/in/tarek-jawish-890998106/" target="_blank" rel="noopener noreferrer">
+                  الملف الشخصي
+                </a>
+              </div>
+            </div>
           </details>
         </div>
       </div>
@@ -352,8 +321,6 @@
     }
 
     function buildLocalDate(dateStr, timeStr){
-      // dateStr: YYYY-MM-DD
-      // timeStr: HH:MM(:SS)  (عادةً 24 ساعة)
       const parts = (dateStr || "").split("-").map(Number);
       if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
 
@@ -399,8 +366,6 @@
     function start(){
       const name = ($("name").value || "").trim();
       const date = $("birthDate").value;
-
-      // إذا ترك الوقت فارغًا سيتم اعتباره 00:00:00
       const time = $("birthTime").value || "00:00:00";
 
       if (!date){
@@ -437,7 +402,6 @@
         const days    = Math.floor(hours / 24);
         const weeks   = Math.floor(days / 7);
 
-        // Approximate years/months using average year length
         const yearsApprox  = diffMs / (1000 * 60 * 60 * 24 * 365.2425);
         const monthsApprox = yearsApprox * 12;
 
@@ -454,7 +418,6 @@
       interval = setInterval(update, 1000);
     }
 
-    // Restore inputs on load + auto-save on change
     document.addEventListener("DOMContentLoaded", () => {
       restoreInputs();
 
@@ -462,7 +425,6 @@
         $(id).addEventListener("input", saveInputs);
       });
 
-      // Optional: إذا كانت البيانات موجودة، شغّل الحساب تلقائيًا
       if ($("birthDate").value) {
         start();
       }
